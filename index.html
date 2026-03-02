@@ -31,8 +31,109 @@
 
   <title>bigkit_flutter_website</title>
   <link rel="manifest" href="manifest.json">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+    }
+    
+    #loading-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica",
+        "Arial", sans-serif;
+    }
+    
+    #loading-screen.hidden {
+      display: none;
+    }
+    
+    .loading-content {
+      text-align: center;
+      color: white;
+    }
+    
+    .spinner {
+      border: 6px solid rgba(255, 255, 255, 0.3);
+      border-top: 6px solid white;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 24px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+  </style>
 </head>
 <body>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <div class="loading-text">Loading to load all assets...</div>
+    </div>
+  </div>
+  
   <script src="flutter_bootstrap.js" async></script>
+  
+  <script>
+    // Hide loading screen when Flutter app is ready
+    window.addEventListener('load', function() {
+      // Give Flutter a moment to initialize (maximum 5 seconds)
+      const maxWaitTime = 5000;
+      const checkInterval = 100;
+      let elapsed = 0;
+      
+      const hideLoadingScreen = function() {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+          loadingScreen.classList.add('hidden');
+        }
+      };
+      
+      const checkApp = setInterval(function() {
+        elapsed += checkInterval;
+        
+        // Check if Flutter app container exists and has rendered content
+        const appContainer = document.querySelector('flt-glass-pane') || 
+                            document.querySelector('[data-dart-widget]') ||
+                            document.querySelector('flutter-app') ||
+                            document.querySelector('canvas');
+        
+        if (appContainer || elapsed >= maxWaitTime) {
+          clearInterval(checkApp);
+          // Small delay for smooth transition
+          setTimeout(hideLoadingScreen, 300);
+        }
+      }, checkInterval);
+    });
+  </script>
 </body>
 </html>
